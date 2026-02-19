@@ -8,38 +8,33 @@ app.post("/chat", async (req, res) => {
     const message = req.body.message;
 
     try {
-        const response = await fetch(
-            "https://router.huggingface.co/models/google/flan-t5-base",
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${process.env.HF_TOKEN}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    inputs: message
-                })
-            }
-        );
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: "Eres un NPC amable dentro de un juego de Roblox." },
+                    { role: "user", content: message }
+                ]
+            })
+        });
 
-        const text = await response.text();
-        console.log("Respuesta RAW:", text);
+        const data = await response.json();
 
-        let reply = "La IA no respondió correctamente";
+        console.log("Respuesta OpenAI:", data);
 
-        try {
-            const data = JSON.parse(text);
-            if (Array.isArray(data) && data.length > 0) {
-                reply = data[0].generated_text || reply;
-            }
-        } catch (e) {
-            reply = "Error procesando respuesta";
-        }
+        const reply =
+            data.choices?.[0]?.message?.content ||
+            "La IA no respondió correctamente";
 
         res.json({ reply });
 
     } catch (error) {
-        console.error("ERROR GENERAL:", error);
+        console.error("ERROR:", error);
         res.json({ reply: "Error con la IA" });
     }
 });

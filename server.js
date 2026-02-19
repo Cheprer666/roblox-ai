@@ -30,10 +30,12 @@ app.post("/chat", async (req, res) => {
 
         const data = await response.json();
 
+        console.log("Respuesta de HuggingFace:", data);
+
         let reply = "No entendí 😅";
 
-        if (Array.isArray(data) && data[0]?.generated_text) {
-            reply = data[0].generated_text;
+        if (Array.isArray(data) && data.length > 0) {
+            reply = data[0].generated_text || "No entendí 😅";
         }
 
         res.json({ reply: reply });

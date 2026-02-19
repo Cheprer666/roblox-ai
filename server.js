@@ -6,8 +6,7 @@ app.use(express.json());
 
 const HF_TOKEN = process.env.HF_TOKEN;
 
-// NUEVA URL CORRECTA
-const MODEL_URL = "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium";
+const MODEL_URL = "https://router.huggingface.co/v1/models/microsoft/DialoGPT-medium";
 
 app.get("/", (req, res) => {
     res.send("Servidor con IA funcionando 🤖🔥");
@@ -28,14 +27,19 @@ app.post("/chat", async (req, res) => {
             })
         });
 
-        const data = await response.json();
+        const text = await response.text();
 
-        console.log("Respuesta de HuggingFace:", data);
+        console.log("Respuesta RAW:", text);
 
-        let reply = "No entendí 😅";
+        let reply = "Error con la IA 😢";
 
-        if (Array.isArray(data) && data.length > 0) {
-            reply = data[0].generated_text || "No entendí 😅";
+        try {
+            const data = JSON.parse(text);
+            if (Array.isArray(data) && data.length > 0) {
+                reply = data[0].generated_text || reply;
+            }
+        } catch (e) {
+            reply = "La IA no respondió correctamente 😢";
         }
 
         res.json({ reply: reply });

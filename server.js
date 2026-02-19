@@ -6,8 +6,8 @@ app.use(express.json());
 
 const HF_TOKEN = process.env.HF_TOKEN;
 
-// Modelo gratuito de Hugging Face
-const MODEL_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium";
+// NUEVA URL CORRECTA
+const MODEL_URL = "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium";
 
 app.get("/", (req, res) => {
     res.send("Servidor con IA funcionando 🤖🔥");

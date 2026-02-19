@@ -1,37 +1,32 @@
-const express = require("express");
 require("dotenv").config();
+const express = require("express");
+const fetch = require("node-fetch");
 
 const app = express();
 app.use(express.json());
 
-const HF_TOKEN = process.env.HF_TOKEN;
-
-const MODEL_URL = "https://router.huggingface.co/v1/models/microsoft/DialoGPT-medium";
-
-app.get("/", (req, res) => {
-    res.send("Servidor con IA funcionando 🤖🔥");
-});
-
 app.post("/chat", async (req, res) => {
-    try {
-        const message = req.body.message;
+    const message = req.body.message;
 
-        const response = await fetch(MODEL_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${HF_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                inputs: message
-            })
-        });
+    try {
+        const response = await fetch(
+            "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium",
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.HF_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    inputs: message
+                })
+            }
+        );
 
         const text = await response.text();
-
         console.log("Respuesta RAW:", text);
 
-        let reply = "Error con la IA 😢";
+        let reply = "La IA no respondió correctamente";
 
         try {
             const data = JSON.parse(text);
@@ -39,17 +34,18 @@ app.post("/chat", async (req, res) => {
                 reply = data[0].generated_text || reply;
             }
         } catch (e) {
-            reply = "La IA no respondió correctamente 😢";
+            reply = "Error procesando respuesta";
         }
 
-        res.json({ reply: reply });
+        res.json({ reply });
 
     } catch (error) {
         console.error(error);
-        res.json({ reply: "Error con la IA 😢" });
+        res.json({ reply: "Error con la IA" });
     }
 });
 
-app.listen(3000, () => {
-    console.log("Servidor activo con IA en puerto 3000 🚀");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log("Servidor activo con IA en puerto " + PORT + " 🚀");
 });

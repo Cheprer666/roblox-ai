@@ -1,8 +1,5 @@
-const fetch = require("node-fetch");
-
 require("dotenv").config();
 const express = require("express");
-const fetch = require("node-fetch");
 
 const app = express();
 app.use(express.json());
@@ -42,7 +39,7 @@ app.post("/chat", async (req, res) => {
         res.json({ reply });
 
     } catch (error) {
-        console.error(error);
+        console.error("ERROR GENERAL:", error);
         res.json({ reply: "Error con la IA" });
     }
 });

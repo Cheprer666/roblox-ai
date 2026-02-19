@@ -1,22 +1,50 @@
 const express = require("express");
-const app = express();
+const fetch = require("node-fetch");
+require("dotenv").config();
 
+const app = express();
 app.use(express.json());
 
-// Ruta para probar si el servidor funciona
+const HF_TOKEN = process.env.HF_TOKEN;
+
+// Modelo gratuito de Hugging Face
+const MODEL_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium";
+
 app.get("/", (req, res) => {
-    res.send("Servidor funcionando correctamente 🚀");
+    res.send("Servidor con IA funcionando 🤖🔥");
 });
 
-// Ruta para el chat
-app.post("/chat", (req, res) => {
-    const message = req.body.message;
+app.post("/chat", async (req, res) => {
+    try {
+        const message = req.body.message;
 
-    const reply = "Hola 👋 dijiste: " + message;
+        const response = await fetch(MODEL_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${HF_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                inputs: message
+            })
+        });
 
-    res.json({ reply: reply });
+        const data = await response.json();
+
+        let reply = "No entendí 😅";
+
+        if (data && data.generated_text) {
+            reply = data.generated_text;
+        }
+
+        res.json({ reply: reply });
+
+    } catch (error) {
+        console.error(error);
+        res.json({ reply: "Error con la IA 😢" });
+    }
 });
 
 app.listen(3000, () => {
-    console.log("Servidor activo en http://localhost:3000");
+    console.log("Servidor activo con IA en puerto 3000 🚀");
 });

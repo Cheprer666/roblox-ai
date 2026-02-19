@@ -1,7 +1,4 @@
-const fetch = require("node-fetch");
-
 const express = require("express");
-const fetch = require("node-fetch");
 require("dotenv").config();
 
 const app = express();
@@ -35,8 +32,8 @@ app.post("/chat", async (req, res) => {
 
         let reply = "No entendí 😅";
 
-        if (data && data.generated_text) {
-            reply = data.generated_text;
+        if (Array.isArray(data) && data[0]?.generated_text) {
+            reply = data[0].generated_text;
         }
 
         res.json({ reply: reply });

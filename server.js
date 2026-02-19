@@ -9,7 +9,7 @@ app.post("/chat", async (req, res) => {
 
     try {
         const response = await fetch(
-            "https://router.huggingface.co/hf-inference/models/microsoft/DialoGPT-medium",
+            "https://router.huggingface.co/hf-inference/models/google/flan-t5-base",
             {
                 method: "POST",
                 headers: {
